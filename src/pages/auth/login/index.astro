@@ -1,0 +1,35 @@
+---
+import {
+  GROUP_ME_AUTH_REDIRECT,
+  ACCESS_TOKEN_KEY,
+  PREVIOUS_PAGE_KEY,
+} from "@utils/const";
+
+export const prerender = false;
+
+const accessTokenCookie = Astro.cookies.get(ACCESS_TOKEN_KEY);
+const accessTokenSearchParam = Astro.url.searchParams.get("access_token");
+
+let accessToken: string;
+
+if (accessTokenCookie) {
+  accessToken = accessTokenCookie.value;
+} else if (accessTokenSearchParam) {
+  Astro.cookies.set(ACCESS_TOKEN_KEY, accessTokenSearchParam, {});
+  const previousPage = Astro.cookies.get(PREVIOUS_PAGE_KEY);
+  if (previousPage) {
+    return Astro.redirect(previousPage.value);
+  }
+  accessToken = accessTokenSearchParam;
+} else {
+  return Astro.redirect(GROUP_ME_AUTH_REDIRECT);
+}
+---
+
+{
+  accessToken ? (
+    <p>You've successfully signed in.</p>
+  ) : (
+    <a href={GROUP_ME_AUTH_REDIRECT}>Click here to sign in</a>
+  )
+}
