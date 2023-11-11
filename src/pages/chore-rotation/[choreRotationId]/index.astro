@@ -46,9 +46,11 @@ if (Astro.request.method === "POST") {
   rotations={choreRotations}
   user={groupMeUser}
 >
-  <Rotation choreRotation={choreRotation} user={user} groups={groups} />
-  <form method="post" class="form">
-    <input type="hidden" name="action" value="DELETE" />
-    <button class="button danger" type="submit">Delete</button>
-  </form>
+  <div class="box mx-5">
+    <Rotation choreRotation={choreRotation} user={user} groups={groups} />
+    <form method="post" class="form">
+      <input type="hidden" name="action" value="DELETE" />
+      <button class="button danger" type="submit">Delete</button>
+    </form>
+  </div>
 </Layout>

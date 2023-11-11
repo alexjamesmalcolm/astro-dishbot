@@ -77,24 +77,29 @@ const formattedErrors: ZodFormattedError<ChoreRotationData> | undefined =
 ---
 
 <Layout title="Chore Rotation" rotations={choreRotations} user={groupMeUser}>
-  <div class="container">
-    <p>These are the chore rotations</p>
+  <div class="columns">
     {
       choreRotations.map((rotation) => {
         return (
-          <Rotation
-            groups={groupMeGroups}
-            choreRotation={rotation}
-            user={user}
-          />
+          <div class="column is-half">
+            <div class="box">
+              <Rotation
+                groups={groupMeGroups}
+                choreRotation={rotation}
+                user={user}
+              />
+            </div>
+          </div>
         );
       })
     }
-    <ChoreRotationCreationForm
-      id={uniqueIdentifier}
-      formattedErrors={formattedErrors}
-      groupMeGroups={groupMeGroups}
-      initialFormData={data}
-    />
+    <div class="column">
+      <ChoreRotationCreationForm
+        id={uniqueIdentifier}
+        formattedErrors={formattedErrors}
+        groupMeGroups={groupMeGroups}
+        initialFormData={data}
+      />
+    </div>
   </div>
 </Layout>

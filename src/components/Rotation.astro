@@ -33,7 +33,7 @@ const nextResetDate = parseSchedule(choreRotation.reset.schedule).next(
 ) as Date;
 ---
 
-<div class="box">
+<div>
   <p>ID: {choreRotation.id}</p>
   <p>Name: {choreRotation.details.name}</p>
   <figure class="image is-48x48">
@@ -52,5 +52,5 @@ const nextResetDate = parseSchedule(choreRotation.reset.schedule).next(
     Started: {new Date(choreRotation.fines.rotationStartDate).toLocaleString()}
   </p>
   <p>Time Left: <Countdown client:idle date={nextFineDate} /></p>
-  <pre>{JSON.stringify(choreRotation, null, 2)}</pre>
+  <!-- <pre>{JSON.stringify(choreRotation, null, 2)}</pre> -->
 </div>
