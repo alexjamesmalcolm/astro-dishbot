@@ -3,7 +3,7 @@ import Layout from "@layouts/Layout.astro";
 import { ACCESS_TOKEN_KEY, GROUP_ME_AUTH_REDIRECT } from "@utils/const";
 import { getUser, ChoreRotationData } from "@utils/redis";
 import Rotation from "@components/Rotation.astro";
-import { v4 as uuid } from "uuid";
+import { humanReadableId } from "@alexjamesmalcolm/human-readable-ids";
 import type { ZodError, ZodFormattedError } from "zod";
 import ChoreRotationCreationForm from "src/pages/chore-rotation/ChoreRotationCreationForm.astro";
 /*
@@ -28,7 +28,7 @@ let [choreRotations, groupMeGroups, groupMeUser] = await Promise.all([
 
 let rotationCreationError: ZodError<ChoreRotationData> | undefined;
 let data: FormData | undefined;
-let uniqueIdentifier = uuid();
+let uniqueIdentifier = humanReadableId();
 if (Astro.request.method === "POST") {
   data = await Astro.request.formData();
   const groupId = data.get("groupMe.groupId");
@@ -40,7 +40,7 @@ if (Astro.request.method === "POST") {
   const rawFineAmount = data.get("fines.fineAmount");
 
   const unsafeData = {
-    id: uuid(),
+    id: uniqueIdentifier,
     details: {
       ownerId: groupMeUser.id,
       name: data.get("details.name"),
