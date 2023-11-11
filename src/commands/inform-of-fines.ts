@@ -6,7 +6,12 @@ import {
   didEventAlreadyHappen,
   getFormattedCountdown,
 } from "@utils/frequency";
-import { connectToRedis, User, type MemberData } from "@utils/redis";
+import {
+  connectToRedis,
+  User,
+  type MemberData,
+  ChoreRotation,
+} from "@utils/redis";
 
 /*
 This file is meant for being ran every 10 minutes to inform users of scheduled alerts such as if someone is about to be fined or has already been fined.
@@ -14,59 +19,76 @@ This file is meant for being ran every 10 minutes to inform users of scheduled a
 There is a date for each rotation which is the "reset" date. If the most recent reset date is too long ago then a reset will be performed as a part of this.
 */
 
+async function handleReset(user: User, rotation: ChoreRotation) {
+  const lastResetDate = new Date(rotation.reset.lastResetDate);
+  const shouldReset = didEventAlreadyHappen(
+    lastResetDate,
+    rotation.reset.schedule
+  );
+  if (!shouldReset) {
+    return;
+  }
+  console.log("Should reset");
+  let message = "";
+  for (let i = 0; i < rotation.groupMe.members.length; i++) {
+    const member = rotation.groupMe.members[i];
+    message += `${member.name} owes $${member.fines}`;
+    member.fines = 0;
+  }
+  await rotation.save();
+  (await user.getBotForRotation(rotation)).sendMessage(message);
+}
+
+async function handleFines(user: User, rotation: ChoreRotation) {
+  let rotationStartDate = new Date(rotation.fines.rotationStartDate);
+  const shouldFine = didEventAlreadyHappen(
+    rotationStartDate,
+    rotation.fines.schedule
+  );
+  if (!shouldFine) {
+    return;
+  }
+  console.log("Should fine");
+  const messageData: {
+    fineTotal?: number;
+    originalMember?: MemberData;
+    nextMember?: MemberData;
+  } = {};
+  for (let i = 0; i < rotation.groupMe.members.length; i++) {
+    const member = rotation.groupMe.members[i];
+    if (member.id === rotation.fines.idOfResponsibleMember) {
+      messageData.originalMember = member;
+      member.fines += rotation.fines.fineAmount;
+      messageData.fineTotal = member.fines;
+      const nextMember = getNext(rotation.groupMe.members, i);
+      if (nextMember) {
+        rotation.fines.idOfResponsibleMember = nextMember.id;
+        messageData.nextMember = nextMember;
+      }
+      break;
+    }
+  }
+  rotationStartDate = new Date();
+  rotation.fines.rotationStartDate = rotationStartDate.toISOString();
+  const schedule = parseSchedule(rotation.fines.schedule);
+  const next = schedule.next(1, rotationStartDate) as Date;
+  await rotation.save();
+  const bot = await user.getBotForRotation(rotation);
+  const message = `${messageData.originalMember?.name} was fined $${
+    rotation.fines.fineAmount
+  } and now owes $${messageData.fineTotal}, now ${
+    messageData.nextMember?.name
+  } is responsible and has ${getFormattedCountdown(next)} left.`;
+  await bot.sendMessage(message);
+}
+
 async function processUser(user: User) {
   const rotations = await user.getOwnedRotations();
   for await (const rotation of rotations) {
     // First reset
-    const lastResetDate = new Date(rotation.reset.lastResetDate);
-    const shouldReset = didEventAlreadyHappen(
-      lastResetDate,
-      rotation.reset.schedule
-    );
-    if (shouldReset) {
-      console.log("Should reset");
-    }
+    await handleReset(user, rotation);
     // Then do fines
-    const rotationStartDate = new Date(rotation.fines.rotationStartDate);
-    const shouldFine = didEventAlreadyHappen(
-      rotationStartDate,
-      rotation.fines.schedule
-    );
-    if (shouldFine) {
-      console.log("Should fine");
-      const messageData: {
-        fineTotal?: number;
-        originalMember?: MemberData;
-        nextMember?: MemberData;
-      } = {};
-      for (let i = 0; i < rotation.groupMe.members.length; i++) {
-        const member = rotation.groupMe.members[i];
-        if (member.id === rotation.fines.idOfResponsibleMember) {
-          messageData.originalMember = member;
-          member.fines += rotation.fines.fineAmount;
-          messageData.fineTotal = member.fines;
-          const nextMember = getNext(rotation.groupMe.members, i);
-          if (nextMember) {
-            rotation.fines.idOfResponsibleMember = nextMember.id;
-            messageData.nextMember = nextMember;
-          }
-          break;
-        }
-      }
-      const rotationStartDate = new Date();
-      rotation.fines.rotationStartDate = rotationStartDate.toISOString();
-      const schedule = parseSchedule(rotation.fines.schedule);
-      const next = schedule.next(1, rotationStartDate) as Date;
-      await rotation.save();
-      const bot = await user.getBotForRotation(rotation);
-      const message = `${messageData.originalMember?.name} was fined $${
-        rotation.fines.fineAmount
-      } and now owes $${messageData.fineTotal}, now ${
-        messageData.nextMember?.name
-      } is responsible and has ${getFormattedCountdown(next)} left.`;
-      //   await user.sendMessage(rotation.groupMe.groupId, message);
-      await bot.sendMessage(message);
-    }
+    await handleFines(user, rotation);
   }
 }
 

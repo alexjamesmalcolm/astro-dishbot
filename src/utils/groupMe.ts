@@ -116,13 +116,16 @@ export class Bot implements BotData {
   }
 
   async sendMessage(message: string) {
-    // Send a message to group
     const client = new GroupMe.Client(this.accessToken);
     await client.login();
-    const result = await client.rest.api("POST", "bots/post", {
-      body: { bot_id: this.bot_id, text: message },
-    });
-    console.log(result);
+    await client.rest.api(
+      "POST",
+      "bots/post",
+      {
+        body: { bot_id: this.bot_id, text: message },
+      },
+      { skipJsonParse: true }
+    );
   }
 }
 
@@ -161,13 +164,17 @@ export async function createBot(
 export async function deleteBot(accessToken: string, botId: string) {
   const client = new GroupMe.Client(accessToken);
   await client.login();
-  const result = await client.rest.api(
-    "DELETE",
+  const bots = await getBots(accessToken);
+  const bot = bots.find((bot) => bot.bot_id === botId);
+  if (bot) {
+    await bot.sendMessage(`Goodbye all!`);
+  }
+  await client.rest.api(
+    "POST",
     "bots/destroy",
-    { body: { bot_id: botId } },
     {
-      version: "v3",
-    }
+      query: { bot_id: botId, token: accessToken },
+    },
+    { skipJsonParse: true }
   );
-  return result;
 }
