@@ -48,11 +48,11 @@ const nextResetDate = parseSchedule(choreRotation.reset.schedule).next(
       </>
     )
   }
-  <p>Due: <PrettyDate client:load date={nextFineDate} /></p>
+  <p>Due: <PrettyDate client:load date={nextFineDate.toISOString()} /></p>
   <p>
     Started: <PrettyDate
       client:load
-      date={new Date(choreRotation.fines.rotationStartDate)}
+      date={choreRotation.fines.rotationStartDate}
     />
   </p>
   <p>Time Left: <Countdown client:idle date={nextFineDate} /></p>

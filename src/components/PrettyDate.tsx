@@ -1,3 +1,4 @@
-export default function PrettyDate({ date }: { date: Date }) {
-  return <>{date.toLocaleString()}</>;
+export default function PrettyDate({ date }: { date: string }) {
+  console.log(date);
+  return <>{new Date(date).toLocaleString()}</>;
 }
