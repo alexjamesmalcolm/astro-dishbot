@@ -1,6 +1,20 @@
 import { LRUCache } from "lru-cache";
 import GroupMe, { type Group, type Collection } from "node-groupme";
 
+const groupMeClientCache = new LRUCache({ ttl: 1000 * 60, ttlAutopurge: true });
+export async function getClient(accessToken: string) {
+  const cachedValue = groupMeClientCache.get(accessToken) as
+    | GroupMe.Client
+    | undefined;
+  if (cachedValue) {
+    return cachedValue;
+  }
+  const client = new GroupMe.Client(accessToken);
+  await client.login();
+  groupMeClientCache.set(accessToken, client);
+  return client;
+}
+
 const getGroupsCache = new LRUCache({ ttl: 1000 * 60, ttlAutopurge: true });
 export async function getGroups(
   accessToken: string
@@ -11,8 +25,7 @@ export async function getGroups(
   if (cachedValue) {
     return cachedValue;
   }
-  const client = new GroupMe.Client(accessToken);
-  await client.login();
+  const client = await getClient(accessToken);
   const groups = await client.groups.fetch();
   getGroupsCache.set(accessToken, groups);
   return groups;
@@ -36,8 +49,7 @@ export async function getMembers(
   accessToken: string,
   groupId: GroupMe.Group["id"]
 ) {
-  const client = new GroupMe.Client(accessToken);
-  await client.login();
+  const client = await getClient(accessToken);
   const detailedGroup = await client.rest.api<Record<string, unknown>>(
     "GET",
     `groups/${groupId}`
@@ -47,8 +59,7 @@ export async function getMembers(
 }
 
 export async function getUser(accessToken: string) {
-  const client = new GroupMe.Client(accessToken);
-  await client.login();
+  const client = await getClient(accessToken);
   return client.user;
 }
 
@@ -57,8 +68,7 @@ export async function sendMessage(
   groupId: Group["id"],
   message: string
 ) {
-  const client = new GroupMe.Client(accessToken);
-  await client.login();
+  const client = await getClient(accessToken);
   const group = await client.groups.fetch(groupId);
   return group.send(message);
 }
@@ -116,8 +126,7 @@ export class Bot implements BotData {
   }
 
   async sendMessage(message: string) {
-    const client = new GroupMe.Client(this.accessToken);
-    await client.login();
+    const client = await getClient(this.accessToken);
     await client.rest.api(
       "POST",
       "bots/post",
@@ -130,8 +139,7 @@ export class Bot implements BotData {
 }
 
 export async function getBots(accessToken: string): Promise<Bot[]> {
-  const client = new GroupMe.Client(accessToken);
-  await client.login();
+  const client = await getClient(accessToken);
   const botData = await client.rest.api<BotData[]>("GET", "bots", undefined, {
     version: "v3",
   });
@@ -149,8 +157,7 @@ export async function createBot(
     active: boolean;
   }
 ): Promise<Bot> {
-  const client = new GroupMe.Client(accessToken);
-  await client.login();
+  const client = await getClient(accessToken);
   const botData = await client.rest.api<BotData>("POST", "bots", {
     body: { bot: data },
   });
@@ -162,8 +169,7 @@ export async function createBot(
 }
 
 export async function deleteBot(accessToken: string, botId: string) {
-  const client = new GroupMe.Client(accessToken);
-  await client.login();
+  const client = await getClient(accessToken);
   const bots = await getBots(accessToken);
   const bot = bots.find((bot) => bot.bot_id === botId);
   if (bot) {
