@@ -35,6 +35,7 @@ async function handleReset(user: User, rotation: ChoreRotation) {
     message += `${member.name} owes $${member.fines}`;
     member.fines = 0;
   }
+  rotation.reset.lastResetDate = new Date().toISOString();
   await rotation.save();
   (await user.getBotForRotation(rotation)).sendMessage(message);
 }
