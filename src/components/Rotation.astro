@@ -36,7 +36,9 @@ const nextResetDate = parseSchedule(choreRotation.reset.schedule).next(
 
 <div>
   <p>ID: {choreRotation.id}</p>
-  <p>Name: {choreRotation.details.name}</p>
+  <p transition:name={`${choreRotation.id}${choreRotation.details.name}`}>
+    Name: {choreRotation.details.name}
+  </p>
   <figure class="image is-48x48">
     <img class="is-rounded" src={group?.imageURL} />
   </figure>
@@ -48,10 +50,12 @@ const nextResetDate = parseSchedule(choreRotation.reset.schedule).next(
       </>
     )
   }
-  <p>Due: <PrettyDate client:load date={nextFineDate.toISOString()} /></p>
+  <p>
+    Due: <PrettyDate client:only="solid-js" date={nextFineDate.toISOString()} />
+  </p>
   <p>
     Started: <PrettyDate
-      client:load
+      client:only="solid-js"
       date={choreRotation.fines.rotationStartDate}
     />
   </p>
