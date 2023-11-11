@@ -25,13 +25,19 @@ function setAccessToken(token: string) {
 if (accessTokenCookie) {
   accessToken = accessTokenCookie.value;
   setAccessToken(accessToken);
+  const previousPage = Astro.cookies.get(PREVIOUS_PAGE_KEY);
+  if (previousPage) {
+    Astro.cookies.delete(PREVIOUS_PAGE_KEY);
+    return Astro.redirect(previousPage.value);
+  }
 } else if (accessTokenSearchParam) {
+  accessToken = accessTokenSearchParam;
   setAccessToken(accessTokenSearchParam);
   const previousPage = Astro.cookies.get(PREVIOUS_PAGE_KEY);
   if (previousPage) {
+    Astro.cookies.delete(PREVIOUS_PAGE_KEY);
     return Astro.redirect(previousPage.value);
   }
-  accessToken = accessTokenSearchParam;
 } else {
   return Astro.redirect(GROUP_ME_AUTH_REDIRECT);
 }

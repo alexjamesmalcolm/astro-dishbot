@@ -1,6 +1,10 @@
 ---
 import Layout from "@layouts/Layout.astro";
-import { ACCESS_TOKEN_KEY, GROUP_ME_AUTH_REDIRECT } from "@utils/const";
+import {
+  ACCESS_TOKEN_KEY,
+  GROUP_ME_AUTH_REDIRECT,
+  PREVIOUS_PAGE_KEY,
+} from "@utils/const";
 import { getUser, ChoreRotationData } from "@utils/redis";
 import Rotation from "@components/Rotation.astro";
 import { humanReadableId } from "@alexjamesmalcolm/human-readable-ids";
@@ -16,6 +20,12 @@ export const prerender = false;
 
 const accessToken = Astro.cookies.get(ACCESS_TOKEN_KEY);
 if (!accessToken) {
+  const date = new Date();
+  date.setDate(date.getDate() + 7);
+  Astro.cookies.set(PREVIOUS_PAGE_KEY, Astro.url.pathname, {
+    expires: date,
+    path: "/",
+  });
   return Astro.redirect(GROUP_ME_AUTH_REDIRECT);
 }
 
