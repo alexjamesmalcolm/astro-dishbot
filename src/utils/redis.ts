@@ -220,13 +220,22 @@ export const UserData = z.object({
 });
 export type UserData = z.infer<typeof UserData>;
 
+const userCache = new LRUCache({ ttl: 1000 * 60, ttlAutopurge: true });
 export async function getUser(accessToken: string): Promise<User> {
-  console.time("Getting user");
+  const timeId = "Getting user";
+  console.time(timeId);
+  const cachedValue = userCache.get(accessToken) as UserData | undefined;
+  if (cachedValue) {
+    const result = new User(cachedValue);
+    console.timeEnd(timeId);
+    return result;
+  }
   const redis = connectToRedis();
   const results = await redis.get(accessToken);
   if (results) {
     const userData = JSON.parse(results) as UserData;
-    console.timeEnd("Getting user");
+    userCache.set(accessToken, userData);
+    console.timeEnd(timeId);
     return new User(userData);
   }
   const defaultValue: UserData = {
@@ -236,7 +245,7 @@ export async function getUser(accessToken: string): Promise<User> {
     ],
   };
   //   await setUserData(accessToken, defaultValue);
-  console.timeEnd("Getting user");
+  console.timeEnd(timeId);
   return new User(defaultValue);
 }
 
