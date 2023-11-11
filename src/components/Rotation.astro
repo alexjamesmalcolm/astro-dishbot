@@ -3,6 +3,7 @@ import { parseSchedule } from "@utils/frequency";
 import { ChoreRotation, User } from "@utils/redis";
 import type { Collection, Group } from "node-groupme";
 import Countdown from "@components/Countdown";
+import PrettyDate from "./PrettyDate";
 
 interface Props {
   choreRotation: ChoreRotation;
@@ -47,9 +48,12 @@ const nextResetDate = parseSchedule(choreRotation.reset.schedule).next(
       </>
     )
   }
-  <p>Due: {nextFineDate.toLocaleString()}</p>
+  <p>Due: <PrettyDate client:load date={nextFineDate} /></p>
   <p>
-    Started: {new Date(choreRotation.fines.rotationStartDate).toLocaleString()}
+    Started: <PrettyDate
+      client:load
+      date={new Date(choreRotation.fines.rotationStartDate)}
+    />
   </p>
   <p>Time Left: <Countdown client:idle date={nextFineDate} /></p>
   <!-- <pre>{JSON.stringify(choreRotation, null, 2)}</pre> -->
