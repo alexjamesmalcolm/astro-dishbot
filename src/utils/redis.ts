@@ -2,7 +2,15 @@ import Redis from "ioredis";
 import { redisConnectionUrl } from "./environment";
 import type { Group } from "node-groupme";
 import { LRUCache } from "lru-cache";
-import { getGroups, getUser as getGroupMeUser, getMembers } from "./groupMe";
+import {
+  getGroups,
+  getUser as getGroupMeUser,
+  getMembers,
+  sendMessage,
+  getBots,
+  Bot,
+  createBot,
+} from "./groupMe";
 import { z } from "zod";
 import { isValidFrequency } from "./frequency";
 
@@ -10,12 +18,12 @@ export function connectToRedis() {
   return new Redis(redisConnectionUrl);
 }
 
-const MemberData = z.object({
+export const MemberData = z.object({
   id: z.string(),
   name: z.string(),
   fines: z.number(),
 });
-type MemberData = z.infer<typeof MemberData>;
+export type MemberData = z.infer<typeof MemberData>;
 
 export class ChoreRotation implements ChoreRotationData {
   data: ChoreRotationData;
@@ -101,6 +109,24 @@ export class User implements UserData {
 
   getMembersOfGroup(groupId: Group["id"]) {
     return getMembers(this.accessToken, groupId);
+  }
+
+  sendMessage(groupId: Group["id"], message: string) {
+    return sendMessage(this.accessToken, groupId, message);
+  }
+
+  async getBotForRotation(rotation: ChoreRotation): Promise<Bot> {
+    const bots = await getBots(this.accessToken);
+    let bot = bots.find((bot) => bot.group_id === rotation.groupMe.groupId);
+    if (!bot) {
+      bot = await createBot(this.accessToken, {
+        name: rotation.details.name,
+        active: true,
+        group_id: rotation.groupMe.groupId,
+        dm_notification: false,
+      });
+    }
+    return bot;
   }
 
   async deleteRotation(choreRotationId: ChoreRotation["id"]) {
