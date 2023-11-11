@@ -1,0 +1,12 @@
+---
+import Layout from "@layouts/Layout.astro";
+import { isRedisUp as checkIfRedisIsUp } from "@utils/redis";
+
+export const prerender = false;
+
+const isRedisUp = await checkIfRedisIsUp();
+---
+
+<Layout title={`Dishbot: ${isRedisUp ? "UP" : "DOWN"}`} rotations={[]}>
+  <p>Status: {isRedisUp ? "UP" : "DOWN"}</p>
+</Layout>

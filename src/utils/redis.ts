@@ -263,3 +263,10 @@ export async function setUserData(accessToken: string, userData: UserData) {
   const redis = connectToRedis();
   return redis.set(accessToken, JSON.stringify(userData));
 }
+
+export function isRedisUp() {
+  return connectToRedis()
+    .ping()
+    .then(() => true)
+    .catch(() => false);
+}
