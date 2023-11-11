@@ -1,6 +1,6 @@
 import Redis from "ioredis";
 import { redisConnectionUrl } from "./environment";
-import { Group } from "node-groupme";
+import type { Group } from "node-groupme";
 import { LRUCache } from "lru-cache";
 import { getGroups, getUser as getGroupMeUser, getMembers } from "./groupMe";
 import { z } from "zod";
