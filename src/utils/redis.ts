@@ -10,6 +10,7 @@ import {
   getBots,
   Bot,
   createBot,
+  deleteBot,
 } from "./groupMe";
 import { z } from "zod";
 import { isValidFrequency } from "./frequency";
@@ -97,6 +98,13 @@ export class User implements UserData {
     }
     await saveChoreRotation(data);
     await this.save();
+    const choreRotations = await this.getOwnedRotations();
+    const choreRotation = choreRotations.find(
+      (choreRotation) => choreRotation.id === data.id
+    );
+    if (choreRotation) {
+      await this.getBotForRotation(choreRotation);
+    }
   }
 
   getGroupMeUser() {
@@ -115,18 +123,27 @@ export class User implements UserData {
     return sendMessage(this.accessToken, groupId, message);
   }
 
+  async getBotsForRotation(rotation: ChoreRotation): Promise<Bot[]> {
+    const allBots = await getBots(this.accessToken);
+    const bots = allBots.filter(
+      (bot) => bot.group_id === rotation.groupMe.groupId
+    );
+    console.log(bots);
+    return bots;
+  }
+
   async getBotForRotation(rotation: ChoreRotation): Promise<Bot> {
-    const bots = await getBots(this.accessToken);
-    let bot = bots.find((bot) => bot.group_id === rotation.groupMe.groupId);
-    if (!bot) {
-      bot = await createBot(this.accessToken, {
-        name: rotation.details.name,
-        active: true,
-        group_id: rotation.groupMe.groupId,
-        dm_notification: false,
-      });
+    const bots = await this.getBotsForRotation(rotation);
+    const bot = bots.find((bot) => bot.name === rotation.details.name);
+    if (bot) {
+      return bot;
     }
-    return bot;
+    return await createBot(this.accessToken, {
+      name: rotation.details.name,
+      active: true,
+      group_id: rotation.groupMe.groupId,
+      dm_notification: false,
+    });
   }
 
   async deleteRotation(choreRotationId: ChoreRotation["id"]) {
@@ -150,6 +167,8 @@ export class User implements UserData {
       );
       await this.save();
     }
+    const bot = await this.getBotForRotation(choreRotation);
+    await deleteBot(this.accessToken, bot.bot_id);
     await deleteChoreRotation(choreRotation.data);
   }
 
