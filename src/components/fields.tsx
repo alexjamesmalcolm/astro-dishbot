@@ -101,6 +101,7 @@ export function CurrencyField({
           id={name}
           name={name}
           min="0"
+          required
           value={filterString(initialFormData?.get(name))}
         />
       </div>
