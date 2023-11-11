@@ -1,7 +1,22 @@
 ---
+import { ACCESS_TOKEN_KEY } from "@utils/const";
 import Layout from "../layouts/Layout.astro";
+import { getUser } from "@utils/redis";
+export const prerender = false;
+
+const accessToken = Astro.cookies.get(ACCESS_TOKEN_KEY);
+const user = accessToken ? await getUser(accessToken.value) : undefined;
+
+const [rotations, groupMeUser] = await Promise.all([
+  user?.getOwnedRotations(),
+  user?.getGroupMeUser(),
+]);
 ---
 
-<Layout title="Welcome to Astro.">
+<Layout
+  title="Welcome to Astro."
+  rotations={rotations ?? []}
+  user={groupMeUser}
+>
   <p>This is the unused home page</p>
 </Layout>

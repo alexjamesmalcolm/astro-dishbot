@@ -19,9 +19,10 @@ const user = await getUser(accessToken.value);
 
 const { choreRotationId } = Astro.params as unknown as Params;
 
-const [groups, choreRotations] = await Promise.all([
+const [groups, choreRotations, groupMeUser] = await Promise.all([
   user.getGroups(),
   user.getOwnedRotations(),
+  user.getGroupMeUser(),
 ]);
 const choreRotation = choreRotations.find(
   (choreRotation) => choreRotation.id === choreRotationId
@@ -40,7 +41,11 @@ if (Astro.request.method === "POST") {
 }
 ---
 
-<Layout title={choreRotation.details.name}>
+<Layout
+  title={choreRotation.details.name}
+  rotations={choreRotations}
+  user={groupMeUser}
+>
   <Rotation choreRotation={choreRotation} user={user} groups={groups} />
   <form method="post" class="form">
     <input type="hidden" name="action" value="DELETE" />

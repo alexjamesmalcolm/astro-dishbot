@@ -76,7 +76,7 @@ const formattedErrors: ZodFormattedError<ChoreRotationData> | undefined =
   rotationCreationError?.format();
 ---
 
-<Layout title="Chore Rotation">
+<Layout title="Chore Rotation" rotations={choreRotations} user={groupMeUser}>
   <div class="container">
     <p>These are the chore rotations</p>
     {
