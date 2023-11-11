@@ -1,0 +1,56 @@
+---
+import { parseSchedule } from "@utils/frequency";
+import { ChoreRotation, User } from "@utils/redis";
+import type { Collection, Group } from "node-groupme";
+import Countdown from "@components/Countdown";
+
+interface Props {
+  choreRotation: ChoreRotation;
+  groups: Collection<string, Group>;
+  user: User;
+}
+
+const { choreRotation, groups, user } = Astro.props;
+
+const group = groups.find(
+  (group) => group.id === choreRotation.groupMe.groupId
+);
+const members = group ? await user.getMembersOfGroup(group.id) : [];
+function findMember(userId: string) {
+  return members.find((member) => member.user_id === userId);
+}
+const currentMember = findMember(choreRotation.fines.idOfResponsibleMember);
+
+const rotationStartDate = new Date(choreRotation.fines.rotationStartDate);
+const nextFineDate = parseSchedule(choreRotation.fines.schedule).next(
+  1,
+  rotationStartDate
+) as Date;
+
+const nextResetDate = parseSchedule(choreRotation.reset.schedule).next(
+  1,
+  new Date()
+) as Date;
+---
+
+<div class="box">
+  <p>ID: {choreRotation.id}</p>
+  <p>Name: {choreRotation.details.name}</p>
+  <figure class="image is-48x48">
+    <img class="is-rounded" src={group?.imageURL} />
+  </figure>
+  <p>Group: {group?.name}</p>
+  {
+    currentMember && (
+      <>
+        <p>Currently responsible: {currentMember.name}</p>
+      </>
+    )
+  }
+  <p>Due: {nextFineDate.toLocaleString()}</p>
+  <p>
+    Started: {new Date(choreRotation.fines.rotationStartDate).toLocaleString()}
+  </p>
+  <p>Time Left: <Countdown client:idle date={nextFineDate} /></p>
+  <pre>{JSON.stringify(choreRotation, null, 2)}</pre>
+</div>

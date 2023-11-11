@@ -1,4 +1,5 @@
 ---
+import Layout from "@layouts/Layout.astro";
 import {
   GROUP_ME_AUTH_REDIRECT,
   ACCESS_TOKEN_KEY,
@@ -12,10 +13,20 @@ const accessTokenSearchParam = Astro.url.searchParams.get("access_token");
 
 let accessToken: string;
 
+function setAccessToken(token: string) {
+  const date = new Date();
+  date.setDate(date.getDate() + 7);
+  Astro.cookies.set(ACCESS_TOKEN_KEY, token, {
+    expires: date,
+    path: "/",
+  });
+}
+
 if (accessTokenCookie) {
   accessToken = accessTokenCookie.value;
+  setAccessToken(accessToken);
 } else if (accessTokenSearchParam) {
-  Astro.cookies.set(ACCESS_TOKEN_KEY, accessTokenSearchParam, {});
+  setAccessToken(accessTokenSearchParam);
   const previousPage = Astro.cookies.get(PREVIOUS_PAGE_KEY);
   if (previousPage) {
     return Astro.redirect(previousPage.value);
@@ -26,10 +37,13 @@ if (accessTokenCookie) {
 }
 ---
 
-{
-  accessToken ? (
-    <p>You've successfully signed in.</p>
-  ) : (
-    <a href={GROUP_ME_AUTH_REDIRECT}>Click here to sign in</a>
-  )
-}
+<Layout title="Login">
+  {
+    accessToken ? (
+      <p>You've successfully signed in.</p>
+    ) : (
+      <a href={GROUP_ME_AUTH_REDIRECT}>Click here to sign in</a>
+    )
+  }
+  <a href="/chore-rotation/">Go to rotation</a>
+</Layout>

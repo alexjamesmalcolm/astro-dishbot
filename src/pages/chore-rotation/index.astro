@@ -1,0 +1,100 @@
+---
+import Layout from "@layouts/Layout.astro";
+import { ACCESS_TOKEN_KEY, GROUP_ME_AUTH_REDIRECT } from "@utils/const";
+import { getUser, ChoreRotationData } from "@utils/redis";
+import Rotation from "@components/Rotation.astro";
+import { v4 as uuid } from "uuid";
+import type { ZodError, ZodFormattedError } from "zod";
+import ChoreRotationCreationForm from "src/pages/chore-rotation/ChoreRotationCreationForm.astro";
+/*
+Show the user all of the dish wheels that they are a part of, including ones that they did not start.
+
+Have the ability to add new dish wheels, by searching for and selecting an existing group.
+ */
+
+export const prerender = false;
+
+const accessToken = Astro.cookies.get(ACCESS_TOKEN_KEY);
+if (!accessToken) {
+  return Astro.redirect(GROUP_ME_AUTH_REDIRECT);
+}
+
+const user = await getUser(accessToken.value);
+let [choreRotations, groupMeGroups, groupMeUser] = await Promise.all([
+  user.getOwnedRotations(),
+  user.getGroups(),
+  user.getGroupMeUser(),
+]);
+
+let rotationCreationError: ZodError<ChoreRotationData> | undefined;
+let data: FormData | undefined;
+let uniqueIdentifier = uuid();
+if (Astro.request.method === "POST") {
+  data = await Astro.request.formData();
+  const groupId = data.get("groupMe.groupId");
+  const tempId = data.get("id");
+  if (typeof tempId === "string") {
+    uniqueIdentifier = tempId;
+  }
+  const now = new Date();
+  const rawFineAmount = data.get("fines.fineAmount");
+
+  const unsafeData = {
+    id: uuid(),
+    details: {
+      ownerId: groupMeUser.id,
+      name: data.get("details.name"),
+    },
+    fines: {
+      fineAmount:
+        typeof rawFineAmount === "string" && Number.parseInt(rawFineAmount),
+      idOfResponsibleMember: groupMeUser.id,
+      schedule: data.get("fines.schedule"),
+      rotationStartDate: now.toISOString(),
+    },
+    groupMe: {
+      bot: undefined,
+      groupId: groupId,
+      members: [{ id: groupMeUser.id, name: groupMeUser.name, fines: 0 }],
+    },
+    reset: {
+      lastResetDate: now.toISOString(),
+      schedule: data.get("reset.schedule"),
+    },
+  };
+  const result = ChoreRotationData.safeParse(unsafeData);
+  if (result.success) {
+    await user.createRotation(result.data);
+    choreRotations = await user.getOwnedRotations();
+    return Astro.redirect(`/chore-rotation/${result.data.id}/`);
+  } else {
+    rotationCreationError = result.error;
+  }
+}
+
+const formattedErrors: ZodFormattedError<ChoreRotationData> | undefined =
+  rotationCreationError?.format();
+---
+
+<Layout title="Chore Rotation">
+  <div class="container">
+    <p>These are the chore rotations</p>
+    {
+      choreRotations.map((rotation) => {
+        return (
+          <Rotation
+            groups={groupMeGroups}
+            choreRotation={rotation}
+            user={user}
+          />
+        );
+      })
+    }
+    <ChoreRotationCreationForm
+      id={uniqueIdentifier}
+      formattedErrors={formattedErrors}
+      groupMeGroups={groupMeGroups}
+      initialFormData={data}
+    />
+  </div>
+</Layout>

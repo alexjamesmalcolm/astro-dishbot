@@ -1,0 +1,49 @@
+---
+import Rotation from "@components/Rotation.astro";
+import Layout from "@layouts/Layout.astro";
+import { ACCESS_TOKEN_KEY } from "@utils/const";
+import { getUser } from "@utils/redis";
+
+export const prerender = false;
+
+interface Params {
+  choreRotationId: string;
+}
+
+const accessToken = Astro.cookies.get(ACCESS_TOKEN_KEY);
+if (!accessToken) {
+  return Astro.redirect(GROUP_ME_AUTH_REDIRECT);
+}
+
+const user = await getUser(accessToken.value);
+
+const { choreRotationId } = Astro.params as unknown as Params;
+
+const [groups, choreRotations] = await Promise.all([
+  user.getGroups(),
+  user.getOwnedRotations(),
+]);
+const choreRotation = choreRotations.find(
+  (choreRotation) => choreRotation.id === choreRotationId
+);
+if (choreRotation === undefined) {
+  return Astro.redirect("/chore-rotation/");
+}
+
+if (Astro.request.method === "POST") {
+  const data = await Astro.request.formData();
+  const actionType = data.get("action");
+  if (actionType === "DELETE") {
+    await user.deleteRotation(choreRotation.id);
+    return Astro.redirect("/chore-rotation/");
+  }
+}
+---
+
+<Layout title={choreRotation.details.name}>
+  <Rotation choreRotation={choreRotation} user={user} groups={groups} />
+  <form method="post" class="form">
+    <input type="hidden" name="action" value="DELETE" />
+    <button class="button danger" type="submit">Delete</button>
+  </form>
+</Layout>

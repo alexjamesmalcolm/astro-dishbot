@@ -1,0 +1,63 @@
+---
+import type { ZodFormattedError } from "zod";
+import FormErrors from "@components/FormErrors.tsx";
+import type { ChoreRotationData } from "@utils/redis";
+import type { Collection, Group } from "node-groupme";
+import { StringField, CurrencyField, ScheduleField } from "@components/fields";
+
+export const prerender = false;
+
+interface Props {
+  formattedErrors: ZodFormattedError<ChoreRotationData> | undefined;
+  groupMeGroups: Collection<string, Group>;
+  initialFormData: FormData | undefined;
+  id: string;
+}
+
+const { formattedErrors, groupMeGroups, initialFormData, id } = Astro.props;
+---
+
+<form class="form box" method="post">
+  <input type="hidden" name="id" value={id} />
+  <StringField
+    label="Name:"
+    name="details.name"
+    errors={formattedErrors?.details?.name?._errors}
+    initialFormData={initialFormData}
+  />
+  <div class="field">
+    <label for="groupMe.groupId">Group:</label>
+    <div class="control">
+      <div class="select">
+        <select required id="groupMe.groupId" name="groupMe.groupId"
+          >{
+            groupMeGroups.map((group) => {
+              return <option value={group.id}>{group.name}</option>;
+            })
+          }
+        </select>
+      </div>
+    </div>
+    <FormErrors errors={formattedErrors?.groupMe?.groupId?._errors} />
+  </div>
+  <CurrencyField
+    name="fines.fineAmount"
+    errors={formattedErrors?.fines?.fineAmount?._errors}
+    initialFormData={initialFormData}
+  />
+  <ScheduleField
+    client:idle
+    label="Fine Schedule"
+    name="fines.schedule"
+    errors={formattedErrors?.fines?.schedule?._errors}
+    initialFormData={initialFormData}
+  />
+  <ScheduleField
+    client:idle
+    label="Reset Schedule"
+    name="reset.schedule"
+    errors={formattedErrors?.reset?.schedule?._errors}
+    initialFormData={initialFormData}
+  />
+  <button class="button" type="submit">Submit</button>
+</form>

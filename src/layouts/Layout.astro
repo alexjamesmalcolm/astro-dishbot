@@ -1,9 +1,24 @@
 ---
+import { ACCESS_TOKEN_KEY } from "@utils/const";
+import { getUser, type ChoreRotation } from "@utils/redis";
+import classes from "classnames";
 interface Props {
   title: string;
 }
 
 const { title } = Astro.props;
+
+const accessToken = Astro.cookies.get(ACCESS_TOKEN_KEY);
+const user = accessToken ? await getUser(accessToken.value) : undefined;
+let [groupMeUser, rotations] = await Promise.all([
+  user?.getGroupMeUser(),
+  user?.getOwnedRotations(),
+]);
+function hasRotations(
+  rotations: ChoreRotation[] | undefined
+): rotations is ChoreRotation[] {
+  return !!rotations && rotations.length > 0;
+}
 ---
 
 <!doctype html>
@@ -12,40 +27,62 @@ const { title } = Astro.props;
     <meta charset="UTF-8" />
     <meta name="description" content="Astro description" />
     <meta name="viewport" content="width=device-width" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css"
+    />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="manifest" href="/site.webmanifest" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
   </head>
   <body>
+    <header>
+      <nav class="navbar">
+        <div class="navbar-brand">
+          <a class="navbar-item" href="/"
+            ><img src="/android-chrome-512x512.png" />Dishbot</a
+          >
+        </div>
+        <div class="navbar-menu">
+          <div class="navbar-start">
+            <div
+              class={classes("navbar-item", {
+                "has-dropdown is-hoverable": hasRotations(rotations),
+              })}
+            >
+              <a
+                class={classes({ "navbar-link": hasRotations(rotations) })}
+                href="/chore-rotation/">Rotations</a
+              >
+              {
+                hasRotations(rotations) && (
+                  <div class="navbar-dropdown">
+                    {rotations.map((rotation) => (
+                      <a
+                        class="navbar-item"
+                        href={`/chore-rotation/${rotation.id}/`}
+                      >
+                        {rotation.details.name}
+                      </a>
+                    ))}
+                  </div>
+                )
+              }
+            </div>
+          </div>
+          {
+            groupMeUser && (
+              <div class="navbar-end">
+                <div class="navbar-item">{groupMeUser.name}</div>
+              </div>
+            )
+          }
+        </div>
+      </nav>
+    </header>
     <slot />
   </body>
 </html>
-<style is:global>
-  :root {
-    --accent: 136, 58, 234;
-    --accent-light: 224, 204, 250;
-    --accent-dark: 49, 10, 101;
-    --accent-gradient: linear-gradient(
-      45deg,
-      rgb(var(--accent)),
-      rgb(var(--accent-light)) 30%,
-      white 60%
-    );
-  }
-  html {
-    font-family: system-ui, sans-serif;
-    background: #13151a;
-    background-size: 224px;
-  }
-  code {
-    font-family:
-      Menlo,
-      Monaco,
-      Lucida Console,
-      Liberation Mono,
-      DejaVu Sans Mono,
-      Bitstream Vera Sans Mono,
-      Courier New,
-      monospace;
-  }
-</style>
