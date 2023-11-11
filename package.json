@@ -9,7 +9,7 @@
     "build": "astro check && astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "inform-of-fines": "ts-node-esm commands/inform-of-fines.ts"
+    "inform-of-fines": "tsx src/commands/inform-of-fines.ts"
   },
   "dependencies": {
     "@alexjamesmalcolm/human-readable-ids": "^1.0.12",
@@ -23,7 +23,7 @@
     "lru-cache": "^10.0.1",
     "node-groupme": "^4.0.0",
     "solid-js": "^1.8.5",
-    "ts-node": "^10.9.1",
+    "tsx": "^4.1.1",
     "typescript": "^5.2.2",
     "zod": "^3.22.4"
   },
