@@ -2,6 +2,8 @@
 import { ACCESS_TOKEN_KEY } from "@utils/const";
 import { getUser, type ChoreRotation } from "@utils/redis";
 import classes from "classnames";
+import { ViewTransitions } from "astro:transitions";
+
 interface Props {
   title: string;
 }
@@ -37,9 +39,10 @@ function hasRotations(
     <link rel="manifest" href="/site.webmanifest" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
+    <ViewTransitions />
   </head>
   <body>
-    <header>
+    <header transition:name="header">
       <nav class="navbar">
         <div class="navbar-brand">
           <a class="navbar-item" href="/"
