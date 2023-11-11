@@ -75,8 +75,8 @@ export type ChoreRotationData = z.infer<typeof ChoreRotationData>;
 
 export class User implements UserData {
   data: UserData;
-  constructor(data: UserData) {
-    this.data = data;
+  constructor(data: UserData | unknown) {
+    this.data = UserData.parse(data);
   }
 
   save() {
@@ -169,10 +169,11 @@ export class User implements UserData {
   }
 }
 
-export interface UserData {
-  groupsWithRotations: ChoreRotationData["groupMe"]["groupId"][];
-  accessToken: string;
-}
+export const UserData = z.object({
+  accessToken: z.string(),
+  groupsWithRotations: z.array(z.string()),
+});
+export type UserData = z.infer<typeof UserData>;
 
 export async function getUser(accessToken: string): Promise<User> {
   console.time("Getting user");
