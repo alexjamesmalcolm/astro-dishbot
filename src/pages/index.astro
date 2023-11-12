@@ -14,62 +14,66 @@ const [rotations, groupMeUser] = await Promise.all([
 ---
 
 <Layout title="Dishbot" rotations={rotations ?? []} user={groupMeUser}>
-  <div class="content">
+  <div class="content mx-5">
     <h1>Welcome to Dishbot.net: Simplifying Chores, Strengthening Bonds</h1>
     <p>
       Tired of the age-old debate over who should do the dishes or take out the
       trash? Dishbot.net is here to revolutionize the way you manage household
       chores within your GroupMe community.
     </p>
-    <div class="box">
-      <h2>Key features</h2>
-      <ul>
-        <li>
-          <em>Create Rotations with Ease:</em> Set up chore rotations
-          effortlessly, ensuring everyone contributes their fair share.
-        </li>
-        <li>
-          <em>Seamless Integration:</em> Our intuitive interface seamlessly
-          integrates with GroupMe, enhancing communication and coordination.
-        </li>
-        <li>
-          <em>Task Management:</em> Keep track of tasks, deadlines, and
-          completed chores all in one place.
-        </li>
-      </ul>
+    <div class="columns">
+      <div class="column is-half mx-1">
+        <h2>Key features</h2>
+        <ul>
+          <li>
+            <em>Create Rotations with Ease:</em> Set up chore rotations
+            effortlessly, ensuring everyone contributes their fair share.
+          </li>
+          <li>
+            <em>Seamless Integration:</em> Our intuitive interface seamlessly
+            integrates with GroupMe, enhancing communication and coordination.
+          </li>
+          <li>
+            <em>Task Management:</em> Keep track of tasks, deadlines, and
+            completed chores all in one place.
+          </li>
+        </ul>
+      </div>
+      <div class="box column is-half mx-1">
+        <h2>How it works:</h2>
+        <ol>
+          <li>Connect Dishbot.net to your GroupMe account.</li>
+          <li>Create a chore rotation and invite your roommates.</li>
+          <li>
+            Let Dishbot.net handle the rest, ensuring a fair distribution of
+            chores and a cleaner living space.
+          </li>
+        </ol>
+      </div>
     </div>
-    <div class="box">
-      <h2>How it works:</h2>
-      <ol>
-        <li>Connect Dishbot.net to your GroupMe account.</li>
-        <li>Create a chore rotation and invite your roommates.</li>
-        <li>
-          Let Dishbot.net handle the rest, ensuring a fair distribution of
-          chores and a cleaner living space.
-        </li>
-      </ol>
+    <div class="columns">
+      <div class="box column is-half mx-1">
+        <h2>Benefits</h2>
+        <ul>
+          <li>Enjoy a cleaner and more organized home.</li>
+          <li>Foster a sense of shared responsibility among roommates.</li>
+          <li>
+            Improve communication and reduce conflicts over household duties.
+          </li>
+        </ul>
+      </div>
+      <div class="column is-half mx-1">
+        <h2>See What Our Users Say:</h2>
+        <blockquote>
+          <p>
+            Dishbot.net has made our living arrangement so much smoother. No
+            more arguments about chores – it's all taken care of!
+          </p>
+          <footer>- Sarah, Dishbot.net</footer>
+        </blockquote>
+      </div>
     </div>
-    <div class="box">
-      <h2>Benefits</h2>
-      <ul>
-        <li>Enjoy a cleaner and more organized home.</li>
-        <li>Foster a sense of shared responsibility among roommates.</li>
-        <li>
-          Improve communication and reduce conflicts over household duties.
-        </li>
-      </ul>
-    </div>
-    <div class="box">
-      <h2>See What Our Users Say:</h2>
-      <blockquote>
-        <p>
-          Dishbot.net has made our living arrangement so much smoother. No more
-          arguments about chores – it's all taken care of!
-        </p>
-        <footer>- Sarah, Dishbot.net</footer>
-      </blockquote>
-    </div>
-    <div class="box">
+    <div>
       <h2>Ready to Experience the Difference?</h2>
       <p>
         Sign up now for a free trial and transform the way you manage chores
