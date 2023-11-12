@@ -72,7 +72,7 @@ export default function NavbarContents({
                       name={PREVIOUS_PAGE_KEY}
                       value={currentPage}
                     />
-                    <button class="button" type="submit">
+                    <button class="button is-warning" type="submit">
                       Sign Out
                     </button>
                   </form>
