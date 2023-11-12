@@ -21,9 +21,11 @@ if (!accessToken) {
   return Astro.redirect(GROUP_ME_AUTH_REDIRECT);
 }
 
-const user = await getUser(accessToken.value);
-
 const { choreRotationId } = Astro.params as unknown as Params;
+
+console.time(`/chore-rotation/${choreRotationId}`);
+
+const user = await getUser(accessToken.value);
 
 const [groups, choreRotations, groupMeUser] = await Promise.all([
   user.getGroups(),
@@ -45,6 +47,8 @@ if (Astro.request.method === "POST") {
     return Astro.redirect("/chore-rotation/");
   }
 }
+
+console.timeEnd(`/chore-rotation/${choreRotationId}`);
 ---
 
 <Layout
@@ -56,7 +60,7 @@ if (Astro.request.method === "POST") {
     <Rotation choreRotation={choreRotation} user={user} groups={groups} />
     <form method="post" class="form">
       <input type="hidden" name="action" value="DELETE" />
-      <button class="button danger" type="submit">Delete</button>
+      <button class="button is-danger" type="submit">Delete</button>
     </form>
   </div>
 </Layout>
