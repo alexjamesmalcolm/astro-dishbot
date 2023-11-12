@@ -1,0 +1,12 @@
+---
+import { ACCESS_TOKEN_KEY, PREVIOUS_PAGE_KEY } from "@utils/const";
+
+const data = await Astro.request.formData();
+const previousPage = data.get(PREVIOUS_PAGE_KEY);
+Astro.cookies.delete(ACCESS_TOKEN_KEY, { path: "/" });
+if (typeof previousPage === "string") {
+  return Astro.redirect(previousPage);
+} else {
+  return Astro.redirect("/");
+}
+---

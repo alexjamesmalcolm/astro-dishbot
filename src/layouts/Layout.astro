@@ -1,6 +1,6 @@
 ---
-import { ACCESS_TOKEN_KEY } from "@utils/const";
-import { getUser, type ChoreRotation } from "@utils/redis";
+import { PREVIOUS_PAGE_KEY } from "@utils/const";
+import { type ChoreRotation } from "@utils/redis";
 import classes from "classnames";
 import { ViewTransitions } from "astro:transitions";
 import type { User } from "node-groupme";
@@ -72,7 +72,23 @@ const hasRotations = rotations.length > 0;
           {
             user && (
               <div class="navbar-end">
-                <div class="navbar-item">{user.name}</div>
+                <div class="navbar-item has-dropdown is-hoverable">
+                  <span class="navbar-link">{user.name}</span>
+                  <div class="navbar-dropdown">
+                    <div class="navbar-item">
+                      <form action="/auth/logout/" method="post">
+                        <input
+                          type="hidden"
+                          name={PREVIOUS_PAGE_KEY}
+                          value={Astro.url.pathname}
+                        />
+                        <button class="button" type="submit">
+                          Sign Out
+                        </button>
+                      </form>
+                    </div>
+                  </div>
+                </div>
               </div>
             )
           }
