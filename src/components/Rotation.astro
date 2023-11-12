@@ -34,9 +34,9 @@ const nextResetDate = parseSchedule(choreRotation.reset.schedule).next(
 ) as Date;
 ---
 
-<div>
+<div transition:name={choreRotation.id}>
   <p>ID: {choreRotation.id}</p>
-  <p transition:name={`${choreRotation.id}${choreRotation.details.name}`}>
+  <p>
     Name: {choreRotation.details.name}
   </p>
   <figure class="image is-48x48">
