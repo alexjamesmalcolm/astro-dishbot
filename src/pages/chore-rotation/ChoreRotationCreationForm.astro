@@ -19,12 +19,14 @@ const { formattedErrors, groupMeGroups, initialFormData, id } = Astro.props;
 
 <form class="form box" method="post">
   <input type="hidden" name="id" value={id} />
-  <StringField
-    label="Name:"
-    name="details.name"
-    errors={formattedErrors?.details?.name?._errors}
-    initialFormData={initialFormData}
-  />
+  <div class="field">
+    <StringField
+      label="Name:"
+      name="details.name"
+      errors={formattedErrors?.details?.name?._errors}
+      initialFormData={initialFormData}
+    />
+  </div>
   <div class="field">
     <label for="groupMe.groupId">Group:</label>
     <div class="control">
@@ -40,24 +42,32 @@ const { formattedErrors, groupMeGroups, initialFormData, id } = Astro.props;
     </div>
     <FormErrors errors={formattedErrors?.groupMe?.groupId?._errors} />
   </div>
-  <CurrencyField
-    name="fines.fineAmount"
-    errors={formattedErrors?.fines?.fineAmount?._errors}
-    initialFormData={initialFormData}
-  />
-  <ScheduleField
-    client:idle
-    label="Fine Schedule"
-    name="fines.schedule"
-    errors={formattedErrors?.fines?.schedule?._errors}
-    initialFormData={initialFormData}
-  />
-  <ScheduleField
-    client:idle
-    label="Reset Schedule"
-    name="reset.schedule"
-    errors={formattedErrors?.reset?.schedule?._errors}
-    initialFormData={initialFormData}
-  />
-  <button class="button" type="submit">Submit</button>
+  <div class="field">
+    <CurrencyField
+      name="fines.fineAmount"
+      errors={formattedErrors?.fines?.fineAmount?._errors}
+      initialFormData={initialFormData}
+    />
+  </div>
+  <div class="field">
+    <ScheduleField
+      client:idle
+      label="Fine Schedule"
+      name="fines.schedule"
+      errors={formattedErrors?.fines?.schedule?._errors}
+      initialFormData={initialFormData}
+    />
+  </div>
+  <div class="field">
+    <ScheduleField
+      client:idle
+      label="Reset Schedule"
+      name="reset.schedule"
+      errors={formattedErrors?.reset?.schedule?._errors}
+      initialFormData={initialFormData}
+    />
+  </div>
+  <div class="field">
+    <button class="button" type="submit">Submit</button>
+  </div>
 </form>

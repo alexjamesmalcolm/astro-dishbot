@@ -23,7 +23,7 @@ export function StringField({
   label: string;
 }) {
   return (
-    <div class="field">
+    <>
       <label for={name}>{label}</label>
       <div class="control">
         <input
@@ -35,7 +35,7 @@ export function StringField({
         />
       </div>
       <FormErrors errors={errors} />
-    </div>
+    </>
   );
 }
 
@@ -52,7 +52,7 @@ export function ScheduleField({
 }) {
   const [nextDates, setNextDates] = createSignal<Date[]>([]);
   return (
-    <div class="field">
+    <>
       <label for={name}>{label}</label>
       <div class="control">
         <input
@@ -78,7 +78,7 @@ export function ScheduleField({
       </div>
       <For each={nextDates()}>{(date) => <li>{date.toLocaleString()}</li>}</For>
       <FormErrors errors={errors} />
-    </div>
+    </>
   );
 }
 
@@ -92,7 +92,7 @@ export function CurrencyField({
   errors: string[] | undefined;
 }) {
   return (
-    <div class="field">
+    <>
       <label for={name}>Fine Amount</label>
       <div class="control">
         <input
@@ -106,6 +106,6 @@ export function CurrencyField({
         />
       </div>
       <FormErrors errors={errors} />
-    </div>
+    </>
   );
 }
