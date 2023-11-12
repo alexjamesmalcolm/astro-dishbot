@@ -3,7 +3,9 @@ import type { ZodFormattedError } from "zod";
 import FormErrors from "@components/FormErrors.tsx";
 import type { ChoreRotationData } from "@utils/redis";
 import type { Collection, Group } from "node-groupme";
-import { StringField, CurrencyField, ScheduleField } from "@components/fields";
+import StringField from "@components/StringField";
+import CurrencyField from "@components/CurrencyField";
+import ScheduleField from "@components/ScheduleField";
 
 export const prerender = false;
 
