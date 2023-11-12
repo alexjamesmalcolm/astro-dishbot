@@ -297,6 +297,7 @@ async function saveChoreRotation(data: ChoreRotationData) {
   const redis = connectToRedis();
   await redis.set(groupId, JSON.stringify(allChoreRotationData));
   choreRotationCache.clear();
+  userCache.clear();
 }
 
 async function deleteChoreRotation(data: ChoreRotationData) {
@@ -312,6 +313,7 @@ async function deleteChoreRotation(data: ChoreRotationData) {
   const redis = connectToRedis();
   await redis.set(groupId, JSON.stringify(updatedChoreRotations));
   choreRotationCache.clear();
+  userCache.clear();
 }
 
 export async function setUserData(accessToken: string, userData: UserData) {
