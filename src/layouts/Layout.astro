@@ -17,7 +17,7 @@ const hasRotations = rotations.length > 0;
 ---
 
 <!doctype html>
-<html lang="en">
+<html class="has-navbar-fixed-top" lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="description" content="Astro description" />
@@ -35,66 +35,66 @@ const hasRotations = rotations.length > 0;
     <ViewTransitions />
   </head>
   <body>
-    <header transition:name="header">
-      <nav class="navbar">
-        <div class="navbar-brand">
-          <a class="navbar-item" href="/"
-            ><img src="/android-chrome-512x512.png" />Dishbot</a
+    <nav transition:name="navbar" class="navbar is-fixed-top">
+      <div class="navbar-brand">
+        <a class="navbar-item" href="/"
+          ><img src="/android-chrome-512x512.png" />Dishbot</a
+        >
+      </div>
+      <div class="navbar-menu">
+        <div class="navbar-start">
+          <div
+            class={classes("navbar-item", {
+              "has-dropdown is-hoverable": hasRotations,
+            })}
           >
-        </div>
-        <div class="navbar-menu">
-          <div class="navbar-start">
-            <div
-              class={classes("navbar-item", {
-                "has-dropdown is-hoverable": hasRotations,
-              })}
+            <a
+              class={classes({ "navbar-link": hasRotations })}
+              href="/chore-rotation/">Rotations</a
             >
-              <a
-                class={classes({ "navbar-link": hasRotations })}
-                href="/chore-rotation/">Rotations</a
-              >
-              {
-                hasRotations && (
-                  <div class="navbar-dropdown">
-                    {rotations.map((rotation) => (
-                      <a
-                        class="navbar-item"
-                        href={`/chore-rotation/${rotation.id}/`}
-                      >
-                        {rotation.details.name}
-                      </a>
-                    ))}
-                  </div>
-                )
-              }
-            </div>
+            {
+              hasRotations && (
+                <div class="navbar-dropdown">
+                  {rotations.map((rotation) => (
+                    <a
+                      class="navbar-item"
+                      href={`/chore-rotation/${rotation.id}/`}
+                    >
+                      {rotation.details.name}
+                    </a>
+                  ))}
+                </div>
+              )
+            }
           </div>
-          {
-            user && (
-              <div class="navbar-end">
-                <div class="navbar-item has-dropdown is-hoverable">
-                  <span class="navbar-link">{user.name}</span>
-                  <div class="navbar-dropdown">
-                    <div class="navbar-item">
-                      <form action="/auth/logout/" method="post">
-                        <input
-                          type="hidden"
-                          name={PREVIOUS_PAGE_KEY}
-                          value={Astro.url.pathname}
-                        />
-                        <button class="button" type="submit">
-                          Sign Out
-                        </button>
-                      </form>
-                    </div>
+        </div>
+        {
+          user && (
+            <div class="navbar-end">
+              <div class="navbar-item has-dropdown is-hoverable">
+                <span class="navbar-link">{user.name}</span>
+                <div class="navbar-dropdown">
+                  <div class="navbar-item">
+                    <form action="/auth/logout/" method="post">
+                      <input
+                        type="hidden"
+                        name={PREVIOUS_PAGE_KEY}
+                        value={Astro.url.pathname}
+                      />
+                      <button class="button" type="submit">
+                        Sign Out
+                      </button>
+                    </form>
                   </div>
                 </div>
               </div>
-            )
-          }
-        </div>
-      </nav>
-    </header>
-    <slot />
+            </div>
+          )
+        }
+      </div>
+    </nav>
+    <main>
+      <slot />
+    </main>
   </body>
 </html>
