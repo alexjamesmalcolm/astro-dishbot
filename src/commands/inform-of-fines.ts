@@ -2,9 +2,9 @@
 
 import { getNext } from "@utils/array";
 import {
-  parseSchedule,
   didEventAlreadyHappen,
   getFormattedCountdown,
+  getNextDate,
 } from "@utils/frequency";
 import {
   connectToRedis,
@@ -41,7 +41,7 @@ async function handleReset(user: User, rotation: ChoreRotation) {
 }
 
 async function handleFines(user: User, rotation: ChoreRotation) {
-  let rotationStartDate = new Date(rotation.fines.rotationStartDate);
+  const rotationStartDate = new Date(rotation.fines.rotationStartDate);
   const shouldFine = didEventAlreadyHappen(
     rotationStartDate,
     rotation.fines.schedule
@@ -69,10 +69,8 @@ async function handleFines(user: User, rotation: ChoreRotation) {
       break;
     }
   }
-  rotationStartDate = new Date();
-  rotation.fines.rotationStartDate = rotationStartDate.toISOString();
-  const schedule = parseSchedule(rotation.fines.schedule);
-  const next = schedule.next(1, rotationStartDate) as Date;
+  const next = getNextDate(rotation.fines.schedule, rotationStartDate);
+  rotation.fines.rotationStartDate = next.toISOString();
   await rotation.save();
   const bot = await user.getBotForRotation(rotation);
   const message = `${messageData.originalMember?.name} was fined $${

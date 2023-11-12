@@ -1,5 +1,18 @@
 import later from "@breejs/later";
 
+export function getNextDate(schedule: string, date: Date): Date {
+  const nextDates = parseSchedule(schedule).next(10, date) as Date[];
+  for (let i = 0; i < nextDates.length; i++) {
+    const nextDate = nextDates[i];
+    if (nextDate > date) {
+      return nextDate;
+    }
+  }
+  throw new Error(
+    `Not able to find the next date for schedule "${schedule}" after ${date.toISOString()}`
+  );
+}
+
 export function isValidFrequency(schedule: string): boolean {
   const result = later.parse.text(schedule);
   return result.error === -1;

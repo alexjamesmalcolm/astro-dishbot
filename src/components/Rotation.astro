@@ -1,5 +1,5 @@
 ---
-import { parseSchedule } from "@utils/frequency";
+import { parseSchedule, getNextDate } from "@utils/frequency";
 import { ChoreRotation, User } from "@utils/redis";
 import type { Collection, Group } from "node-groupme";
 import Countdown from "@components/Countdown";
@@ -23,10 +23,10 @@ function findMember(userId: string) {
 const currentMember = findMember(choreRotation.fines.idOfResponsibleMember);
 
 const rotationStartDate = new Date(choreRotation.fines.rotationStartDate);
-const nextFineDate = parseSchedule(choreRotation.fines.schedule).next(
-  1,
+const nextFineDate = getNextDate(
+  choreRotation.fines.schedule,
   rotationStartDate
-) as Date;
+);
 
 const nextResetDate = parseSchedule(choreRotation.reset.schedule).next(
   1,
@@ -46,7 +46,10 @@ const nextResetDate = parseSchedule(choreRotation.reset.schedule).next(
   {
     currentMember && (
       <>
-        <p>Currently responsible: {currentMember.name}</p>
+        <p>
+          Currently responsible: {currentMember.name}{" "}
+          <Countdown client:idle date={nextFineDate} />
+        </p>
       </>
     )
   }
@@ -59,6 +62,5 @@ const nextResetDate = parseSchedule(choreRotation.reset.schedule).next(
       date={choreRotation.fines.rotationStartDate}
     />
   </p>
-  <p>Time Left: <Countdown client:idle date={nextFineDate} /></p>
   <!-- <pre>{JSON.stringify(choreRotation, null, 2)}</pre> -->
 </div>
