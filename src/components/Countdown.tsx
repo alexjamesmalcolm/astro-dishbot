@@ -1,4 +1,4 @@
-import { getFormattedCountdown } from "@utils/frequency";
+import getFormattedCountdown from "@utils/frequency/getFormattedCountdown";
 import { createEffect, createSignal } from "solid-js";
 
 export default function Countdown({ date }: { date: Date }) {

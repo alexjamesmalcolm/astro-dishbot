@@ -13,7 +13,7 @@ import {
   deleteBot,
 } from "./groupMe";
 import { z } from "zod";
-import { isValidFrequency } from "./frequency";
+import isValidFrequency from "./frequency/isValidFrequency";
 
 export function connectToRedis() {
   return new Redis(redisConnectionUrl);

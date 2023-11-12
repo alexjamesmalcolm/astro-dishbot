@@ -1,11 +1,9 @@
 #!/usr/bin/env ts-node
 
 import { getNext } from "@utils/array";
-import {
-  didEventAlreadyHappen,
-  getFormattedCountdown,
-  getNextDate,
-} from "@utils/frequency";
+import didEventAlreadyHappen from "@utils/frequency/didEventAlreadyHappen";
+import getFormattedCountdown from "@utils/frequency/getFormattedCountdown";
+import getNextDate from "@utils/frequency/getNextDate";
 import {
   connectToRedis,
   User,

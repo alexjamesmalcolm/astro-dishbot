@@ -1,5 +1,6 @@
 import FormErrors from "@components/FormErrors";
-import { isValidFrequency, parseSchedule } from "@utils/frequency";
+import isValidFrequency from "@utils/frequency/isValidFrequency";
+import parseSchedule from "@utils/frequency/parseSchedule";
 import { For, createSignal } from "solid-js";
 
 function filterString(

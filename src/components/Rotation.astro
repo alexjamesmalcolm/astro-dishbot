@@ -1,5 +1,6 @@
 ---
-import { parseSchedule, getNextDate } from "@utils/frequency";
+import parseSchedule from "@utils/frequency/parseSchedule";
+import getNextDate from "@utils/frequency/getNextDate";
 import { ChoreRotation, User } from "@utils/redis";
 import type { Collection, Group } from "node-groupme";
 import Countdown from "@components/Countdown";
