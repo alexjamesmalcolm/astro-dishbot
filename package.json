@@ -21,7 +21,7 @@
     "classnames": "^2.3.2",
     "ioredis": "^5.3.2",
     "lru-cache": "^10.0.1",
-    "node-groupme": "^4.0.0",
+    "node-groupme": "^4.1.0",
     "solid-js": "^1.8.5",
     "tsx": "^4.1.1",
     "typescript": "^5.2.2",
